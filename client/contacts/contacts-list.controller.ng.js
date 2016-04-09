@@ -29,6 +29,7 @@ angular.module('vocalApp')
   $scope.save = function() {
     if ($scope.form.$valid) {
       $scope.newContact.createdAt = new Date();
+      $scope.newContact.updatedAt = new Date();
       Contacts.insert($scope.newContact);
       $scope.newContact = undefined;
     }
