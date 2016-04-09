@@ -2,8 +2,8 @@ Meteor.startup(function() {
   if(EventsToContacts.find().count() === 0) {
     var eventsToContacts = [
       {
-        'event': Events.findOne({})._id,
-        'contacts': Contacts.findOne({})._id
+        'eventId': Events.findOne({})._id,
+        'contactId': Contacts.findOne({})._id
       }
     ];
     eventsToContacts.forEach(function(eventsToContact) {
