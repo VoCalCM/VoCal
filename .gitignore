@@ -1,2 +1,3 @@
 .idea/
 .editorconfig
+/server/alexa/node_modules
