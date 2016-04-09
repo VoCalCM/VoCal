@@ -7,20 +7,24 @@
         <input ng-model="event.subject" placeholder="Subject">
       </md-input-container>
 
-      <div layout="row">
+      <div layout="row" layout-align="center center">
         <md-datepicker ng-model="event.startDate" md-placeholder="Start date">
         </md-datepicker>
         <md-input-container class="md-block">
-          <input required type="number" step="any" name="rate" ng-model="event.startHour" min="0"
+          <input required type="number" step="any" name="rate" ng-model="startHour" min="0"
                  max="24" ng-pattern="/^\d+$/" />
         </md-input-container>
+        <span>:</span>
         <md-input-container class="md-block">
-          <input required type="number" step="any" name="rate" ng-model="event.startMinute" min="0"
+          <input required type="number" step="any" name="rate" ng-model="startMinute" min="0"
                  max="60" ng-pattern="/^\d+$/" />
         </md-input-container>
       </div>
 
-
+      <md-input-container class="md-block">
+          <label>Notes</label>
+          <textarea ng-model="event.note" md-maxlength="150" rows="5" md-select-on-focus></textarea>
+      </md-input-container>
 
 
       <div layout="row">
