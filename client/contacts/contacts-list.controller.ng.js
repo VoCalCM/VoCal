@@ -1,7 +1,8 @@
 'use strict';
 
 angular.module('vocalApp')
-.controller('ContactsListCtrl', function($scope) {
+.controller('ContactsListCtrl', function($scope, currentUser) {
+  console.log(currentUser);
   $scope.page = 1;
   $scope.perPage = 3;
   $scope.sort = {name_sort : 1};
@@ -30,6 +31,7 @@ angular.module('vocalApp')
     if ($scope.form.$valid) {
       $scope.newContact.createdAt = new Date();
       $scope.newContact.updatedAt = new Date();
+      $scope.newContact.userId = currentUser._id;
       Contacts.insert($scope.newContact);
       $scope.newContact = undefined;
     }
