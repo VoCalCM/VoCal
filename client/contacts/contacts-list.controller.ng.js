@@ -45,6 +45,10 @@ angular.module('vocalApp')
     $scope.page = newPage;
   };
 
+  $scope.getImageInfo = function() {
+    console.log($scope);
+  };
+
   return $scope.$watch('orderProperty', function() {
     if ($scope.orderProperty) {
       $scope.sort = {

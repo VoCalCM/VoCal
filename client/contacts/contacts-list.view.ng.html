@@ -4,6 +4,9 @@
     <h1>Contacts</h1>
     <form class="md-whiteframe-z1" ng-submit="save()" name="form" novalidate layout-padding="">
       <p>Add a contact</p>
+      <input type="file" accept="image/*" capture="camera" fileread="businessCard"><br/>
+      {{ businessCard }}
+      <a href="" ng-click="getImageInfo()">Get Image Info</a>
       <md-input-container>
         <label>Name</label>
         <input ng-model="newContact.name" placeholder="Name">
