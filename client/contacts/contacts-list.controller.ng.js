@@ -1,4 +1,4 @@
-'use strict'
+'use strict';
 
 angular.module('vocalApp')
 .controller('ContactsListCtrl', function($scope) {
@@ -6,18 +6,18 @@ angular.module('vocalApp')
   $scope.perPage = 3;
   $scope.sort = {name_sort : 1};
   $scope.orderProperty = '1';
-  
+
   $scope.helpers({
     contacts: function() {
       return Contacts.find({}, {
-        sort: $scope.getReactively('sort') 
+        sort: $scope.getReactively('sort')
       });
     },
     contactsCount: function() {
       return Counts.get('numberOfContacts');
     }
   });
-                  
+
   $scope.subscribe('contacts', function() {
     return [{
       sort: $scope.getReactively('sort'),
@@ -28,19 +28,20 @@ angular.module('vocalApp')
 
   $scope.save = function() {
     if ($scope.form.$valid) {
+      $scope.newContact.createdAt = new Date();
       Contacts.insert($scope.newContact);
       $scope.newContact = undefined;
     }
   };
-                  
+
   $scope.remove = function(contact) {
     Contacts.remove({_id:contact.id});
   };
-                  
+
   $scope.pageChanged = function(newPage) {
     $scope.page = newPage;
   };
-                  
+
   return $scope.$watch('orderProperty', function() {
     if ($scope.orderProperty) {
       $scope.sort = {
