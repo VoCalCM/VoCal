@@ -2,7 +2,6 @@
 
 angular.module('vocalApp')
 .controller('EventDetailCtrl', function($scope, $stateParams, $filter, currentUser) {
-  console.log(moment);
   $scope.currentUser = currentUser;
   $scope.helpers({
     event: function() {
@@ -20,8 +19,11 @@ angular.module('vocalApp')
   $scope.$watch('event', function() {
     if($scope.event){
       !$scope.event.startDate ? $scope.event.startDate = new Date() : null;
-      $scope.startHour = Number($filter('date')($scope.event.startDate, "hh"));
-      $scope.startMinute = Number($filter('date')($scope.event.startDate, "mm"));
+      $scope.startHour = moment($scope.event.startDate).get('hour');
+      $scope.startMinute = moment($scope.event.startDate).get('minute');
+      !$scope.event.endDate ? $scope.event.endDate = new Date() : null;
+      $scope.endHour = moment($scope.event.endDate).get('hour');
+      $scope.endMinute = moment($scope.event.endDate).get('minute');
     }
   });
 
@@ -29,6 +31,16 @@ angular.module('vocalApp')
 
   $scope.save = function() {
     if($scope.form.$valid) {
+      var startDate = moment($scope.event.startDate);
+      startDate.set('hour', $scope.startHour);
+      startDate.set('minute', $scope.startMinute);
+      $scope.event.startDate = startDate.toDate();
+
+      var endDate = moment($scope.event.endDate);
+      endDate.set('hour', $scope.endHour);
+      endDate.set('minute', $scope.endMinute);
+      $scope.event.endDate = endDate.toDate();
+
       delete $scope.event._id;
       Events.update({
         _id: $stateParams.eventId
