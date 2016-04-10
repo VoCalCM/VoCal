@@ -12,8 +12,8 @@ Meteor.publish('events', function(options, searchString) {
 });
 
 
-Meteor.method("get-events-date", function (startDate, endDate) {ß
-  //return moment(endDate).format("dddd, MMMM Do YYYY, h:mm:ss a");
+Meteor.method("get-events-date", function (startDate, endDate) {
+  return moment(endDate).format("dddd, MMMM Do YYYY, h:mm:ss a");
   // return Events.find({
   //   startDate:{
   //   '$gte': startDate,
