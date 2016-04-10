@@ -8,6 +8,7 @@ angular.module('vocalApp')
   $scope.perPage = 3;
   $scope.sort = {name_sort : 1};
   $scope.orderProperty = '1';
+  $scope.dataLoading = false;
 
   $scope.helpers({
     contacts: function() {
@@ -55,6 +56,7 @@ angular.module('vocalApp')
   };
 
   $scope.uploadFile = function(){
+    $scope.dataLoading = true;
     var file = $scope.myFile;
     console.log('file is ' );
     console.dir(file);
@@ -90,9 +92,11 @@ angular.module('vocalApp')
               $scope.newContact.phone = entity.normalized_text;
             }
           });
+          $scope.dataLoading = false;
 
         })
         .error(function(error){
+          $scope.dataLoading = false;
         });
       return promise;
     });

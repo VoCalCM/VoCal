@@ -14,6 +14,10 @@
       </div>
     </form>
 
+    <div layout="row" layout-sm="column" layout-align="space-around" ng-show="dataLoading">
+      <md-progress-linear md-mode="indeterminate"></md-progress-linear>
+    </div>
+
     <form class="md-whiteframe-z1" ng-submit="save()" name="form" novalidate layout-padding="">
       <p>Add a contact</p>
       <md-input-container>
