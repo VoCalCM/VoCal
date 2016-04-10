@@ -59,8 +59,8 @@ angular.module('vocalApp')
     console.dir(file);
     var uploadUrl = "https://api.havenondemand.com/1/api/sync/ocrdocument/v1";
     fileUpload.uploadFileToUrl(file, uploadUrl).then(function(response) {
-      console.log(response);
-      $scope.data = response.data.text_block;
+      console.log(response.data.text_block[0].text);
+      $scope.data = response.data.text_block[0].text;
     });
   };
 
