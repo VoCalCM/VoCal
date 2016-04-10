@@ -1,28 +1,44 @@
 <div class="events-list" layout="column">
   <div layout="column" class="main-wrapper md-whiteframe-1dp">
     <h1>Events</h1>
-    <form class="md-whiteframe-z1" ng-submit="save()" name="form" novalidate layout-padding="">
-      <md-input-container>
-        <input ng-model="newEvent.subject" placeholder="New Event">
-      </md-input-container>
-      <input class="md-button md-raised md-primary" type="submit" value="Add">
-    </form>
-    <div layout="row" layout-padding="">
-      <md-input-container flex="65">
-        <label>Search</label>
-        <input type="Search" ng-model="search" placeholder="Search">
-      </md-input-container>
-      <md-select ng-model="orderProperty" flex="35">
-        <md-option value="1">Ascending</md-option>
-        <md-option value="-1">Descending</md-option>
-      </md-select>
+    <div layout="row" layout-padding="" class="md-whiteframe-z1" >
+      <div flex="70">
+          <md-input-container class="no-margin">
+            <input ng-model="newEvent.subject" placeholder="New Event">
+          </md-input-container>
+          <md-button class="md-icon-button md-primary" aria-label="Add" ng-click="save()">
+            <md-icon md-svg-icon="content:ic_add_24px"></md-icon>
+          </md-button>
+      </div>
+      <div flex="30" layout="row">
+        <md-input-container layout-fill>
+          <input type="Search" ng-model="search" placeholder="Search">
+        </md-input-container>
+      </div>
+
     </div>
 
-    <ul>
+    <md-list ng-cloak class="ng-padding-child">
+      <div dir-paginate="event in events | itemsPerPage: perPage" total-items="eventsCount" current-page='page'>
+        <md-list-item ng-href="events/{{ event._id }}" class="md-2-line">
+          <md-icon md-svg-icon="action:ic_event_24px"></md-icon>
+          <div class="md-list-item-text">
+            <h3>{{ event.subject }}</h3>
+            <p>{{ event.startDate | date:'MM/dd/yyyy'}}</p>
+          </div>
+          <md-button class="md-icon-button md-warn md-raised" aria-label="Add" ng-click="remove(event)">
+            <md-icon md-svg-icon="action:ic_delete_24px"></md-icon>
+          </md-button>
+        </md-list-item>
+        <md-divider></md-divider>
+      </div>
+    </md-list>
+
+    <!-- <ul>
       <li dir-paginate="event in events | itemsPerPage: perPage" total-items="eventsCount" current-page='page'>
-        <p><a href="/events/{{event._id}}">{{ event.subject }}</a> <button ng-click="remove(event)">&times;</button></p>
+        <p><a href="/events/{{event._id}}"></a> <button ng-click="remove(event)">&times;</button></p>
       </li>
-    </ul>
+    </ul> -->
     <dir-pagination-controls on-page-change="pageChanged(newPageNumber)"></dir-pagination-controls>
 
     <p>Total number of events: {{eventsCount}}</p>

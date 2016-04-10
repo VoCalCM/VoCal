@@ -3,7 +3,7 @@
 angular.module('vocalApp')
 .controller('EventsListCtrl', function($scope, currentUser) {
   $scope.page = 1;
-  $scope.perPage = 3;
+  $scope.perPage = 10;
   $scope.sort = {name_sort : 1};
   $scope.orderProperty = '1';
 
@@ -28,11 +28,9 @@ angular.module('vocalApp')
 
 
   $scope.save = function() {
-    if ($scope.form.$valid) {
-      $scope.newEvent.userId = currentUser._id;
-      Events.insert($scope.newEvent);
-      $scope.newEvent = undefined;
-    }
+    $scope.newEvent.userId = currentUser._id;
+    Events.insert($scope.newEvent);
+    $scope.newEvent = undefined;
   };
 
   $scope.remove = function(event) {
