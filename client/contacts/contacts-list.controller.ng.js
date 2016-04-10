@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('vocalApp')
-.controller('ContactsListCtrl', function($scope, currentUser) {
+.controller('ContactsListCtrl', function($scope, currentUser, fileUpload) {
   console.log(currentUser);
   $scope.page = 1;
   $scope.perPage = 3;
@@ -38,7 +38,7 @@ angular.module('vocalApp')
   };
 
   $scope.remove = function(contact) {
-    Contacts.remove({_id:contact.id});
+    Contacts.remove({_id:contact._id});
   };
 
   $scope.pageChanged = function(newPage) {
@@ -47,6 +47,21 @@ angular.module('vocalApp')
 
   $scope.getImageInfo = function() {
     console.log($scope);
+  };
+
+  $scope.imageOCR = function() {
+
+  };
+
+  $scope.uploadFile = function(){
+    var file = $scope.myFile;
+    console.log('file is ' );
+    console.dir(file);
+    var uploadUrl = "https://api.havenondemand.com/1/api/sync/ocrdocument/v1";
+    fileUpload.uploadFileToUrl(file, uploadUrl).then(function(response) {
+      console.log(response);
+      $scope.data = response.data.text_block;
+    });
   };
 
   return $scope.$watch('orderProperty', function() {
