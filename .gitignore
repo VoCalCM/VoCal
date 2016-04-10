@@ -1,3 +1,5 @@
 .idea/
 .editorconfig
 /server/alexa/node_modules
+/server/alexa/.DS_Store
+/server/alexa/src/.DS_Store
