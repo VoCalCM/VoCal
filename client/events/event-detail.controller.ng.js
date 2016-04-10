@@ -5,12 +5,13 @@ angular.module('vocalApp')
   $scope.currentUser = currentUser;
   $scope.selectedContacts = [];
   $scope.helpers({
-    event: function() {
+    event () {
       return Events.findOne({ _id: $stateParams.eventId });
-    },
-    eventsToContacts: function(){
-      return EventsToContacts.find({eventId: $stateParams.eventId});
     }
+  });
+
+  $scope.helpers({
+    eventsToContacts: () => EventsToContacts.find({ eventId: $stateParams.eventId })
   });
 
   $scope.subscribe('events', () => [], {
@@ -25,19 +26,35 @@ angular.module('vocalApp')
     }
   });
 
-  $scope.$watch('eventsToContacts', function(newVal, oldVal) {
-
+  $scope.eventsToContactsReady = false;
+  $scope.$watchCollection('eventsToContacts', function(newVal, oldVal) {
     if($scope.eventsToContacts){
-      $scope.eventsToContacts.forEach(function(eventToContact) {
-        console.log(eventToContact);
-      });
-      $scope.selectedContacts = $scope.eventsToContacts;
+      $scope.eventsToContactsReady = true;
+      $scope.eventsToContactsReady && $scope.contactsReady ? $scope.fillContacts() : null;
     }
   });
 
+  $scope.contactsReady = false;
+  $scope.$watchCollection('contacts', function(newVal, oldVal) {
+    if($scope.contacts){
+      $scope.contactsReady = true;
+      $scope.eventsToContactsReady && $scope.contactsReady ? $scope.fillContacts() : null;
+    }
+  });
+
+  $scope.fillContacts = function(){
+    $scope.selectedContacts = [];
+    $scope.eventsToContacts.forEach(function(eventToContact) {
+      $scope.contacts.forEach(function(contact) {
+        if (eventToContact.contactId === contact._id) {
+          $scope.selectedContacts.push(contact);
+        }
+      })
+    });
+  };
+
   $scope.$watch('event', function() {
     if($scope.event){
-      console.log($scope.event);
       !$scope.event.contacts ? $scope.event.contacts = [] : null;
       !$scope.event.startDate ? $scope.event.startDate = new Date() : null;
       $scope.startHour = moment($scope.event.startDate).get('hour');
@@ -61,9 +78,6 @@ angular.module('vocalApp')
     },
     contactsCount: function() {
       return Counts.get('numberOfContacts');
-    },
-    contact: function(target) {
-      return Contacts.findOne({ _id: target });
     }
   });
 
