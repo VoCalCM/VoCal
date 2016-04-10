@@ -1,14 +1,4 @@
 /**
-    Copyright 2014-2015 Amazon.com, Inc. or its affiliates. All Rights Reserved.
-
-    Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance with the License. A copy of the License is located at
-
-        http://aws.amazon.com/apache2.0/
-
-    or in the "license" file accompanying this file. This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
-*/
-
-/**
  * - Web service: communicate with an external web service to get events for specified days in history (Wikipedia API)
  * - Pagination: after obtaining a list of events, read a small subset of events and wait for user prompt to read the next subset of events by maintaining session state
  * - Dialog and Session state: Handles two models, both a one-shot ask and tell model, and a multi-turn dialog model.
@@ -203,8 +193,6 @@ function handleFirstEventRequest(intent, session, response) {
             };
             response.askWithCard(speechOutput, repromptOutput, cardTitle, cardContent);
         }
-
-
 
     });
 }
