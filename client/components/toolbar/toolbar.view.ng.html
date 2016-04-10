@@ -1,11 +1,29 @@
-<md-toolbar class="toolbar md-whiteframe-1dp" layout="row" layout-align="start center" layout-padding="">
-  <div class="navbar-left" layout="row" layout-align="center center">
-    <a href="/">voCal</a>
+<md-toolbar class="toolbar md-whiteframe-1dp" layout="row" layout-align="start center" >
+  <div layout-padding class="navbar-left" layout="row" layout-align="center center" hide-xs hide-sm>
+    <img src="/logo.svg" href="/" style="padding-right: 3vw">
     <md-button ng-href="/events">Events</md-button>
     <md-button ng-href="/contacts">Contacts</md-button>
   </div>
+  <div hide-gt-sm layout="row">
+    <md-fab-speed-dial md-direction="right" class="md-fling">
+        <md-fab-trigger>
+          <md-button aria-label="Menu" class="md-fab">
+            <md-icon md-svg-icon="navigation:ic_menu_24px"></md-icon>
+          </md-button>
+        </md-fab-trigger>
+        <md-fab-actions>
+          <md-button href="/contacts" aria-label="Contacts" class="md-fab md-raised md-mini">
+            <md-icon md-svg-icon="communication:ic_contacts_24px"></md-icon>
+          </md-button>
+          <md-button href="/events" aria-label="Events" class="md-fab md-raised md-mini">
+            <md-icon md-svg-icon="action:ic_event_24px"></md-icon>
+          </md-button>
+        </md-fab-actions>
+    </md-fab-speed-dial>
+  </div>
   <span flex=''></span>
-  <navbar-right>
-    <login-buttons></login-buttons>
+  <navbar-right style="padding: 4vw;">
+    <div hide-gt-sm><img src="/logo.svg" href="/" style="height: 6vw"></div>
+    <login-buttons hide-xs hide-sm></login-buttons>
   </navbar-right>
 </md-toolbar>
