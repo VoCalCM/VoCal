@@ -3,12 +3,15 @@
 angular.module('vocalApp')
 .controller('EventDetailCtrl', function($scope, $stateParams, $filter, currentUser) {
   $scope.currentUser = currentUser;
+  $scope.selectedContacts = [];
   $scope.helpers({
     event: function() {
       return Events.findOne({ _id: $stateParams.eventId });
+    },
+    eventsToContacts: function(){
+      return EventsToContacts.find({eventId: $stateParams.eventId});
     }
   });
-
 
   $scope.subscribe('events', () => [], {
     onReady: function () {
@@ -16,8 +19,26 @@ angular.module('vocalApp')
     }
   });
 
+  $scope.subscribe('eventsToContacts', () => [], {
+    onReady: function () {
+      //Collection ready
+    }
+  });
+
+  $scope.$watch('eventsToContacts', function(newVal, oldVal) {
+
+    if($scope.eventsToContacts){
+      $scope.eventsToContacts.forEach(function(eventToContact) {
+        console.log(eventToContact);
+      });
+      $scope.selectedContacts = $scope.eventsToContacts;
+    }
+  });
+
   $scope.$watch('event', function() {
     if($scope.event){
+      console.log($scope.event);
+      !$scope.event.contacts ? $scope.event.contacts = [] : null;
       !$scope.event.startDate ? $scope.event.startDate = new Date() : null;
       $scope.startHour = moment($scope.event.startDate).get('hour');
       $scope.startMinute = moment($scope.event.startDate).get('minute');
@@ -27,10 +48,32 @@ angular.module('vocalApp')
     }
   });
 
+  $scope.querySearch = function(query) {
+    var contactData = $scope.contacts;
+    return contactData.filter(function(el) {
+      return el.name.toLowerCase().indexOf(query.toLowerCase()) != -1;
+    });
+  };
+
+  $scope.helpers({
+    contacts: function() {
+      return Contacts.find({});
+    },
+    contactsCount: function() {
+      return Counts.get('numberOfContacts');
+    },
+    contact: function(target) {
+      return Contacts.findOne({ _id: target });
+    }
+  });
+
+  $scope.subscribe('contacts');
+
 
 
   $scope.save = function() {
     if($scope.form.$valid) {
+
       var startDate = moment($scope.event.startDate);
       startDate.set('hour', $scope.startHour);
       startDate.set('minute', $scope.startMinute);
@@ -48,10 +91,17 @@ angular.module('vocalApp')
         $set: $scope.event
       }, function(error) {
         if(error) {
-          console.log('Unable to update the event');
+          console.log(error);
         } else {
           console.log('Done!');
         }
+      });
+
+      $scope.selectedContacts.forEach(function(contact) {
+        EventsToContacts.insert({
+          contactId: contact._id,
+          eventId: $stateParams.eventId
+        });
       });
     }
   };

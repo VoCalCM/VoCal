@@ -7,6 +7,16 @@
         <input ng-model="event.subject" placeholder="Subject">
       </md-input-container>
 
+      <md-contact-chips
+        ng-model="selectedContacts"
+        md-contacts="querySearch($query)"
+        md-contact-name="name"
+        md-contact-email="email"
+        md-require-match="true"
+        md-highlight-flags="i"
+        placeholder="To">
+    </md-contact-chips>
+
       <div layout="row" layout-align="center center">
         <md-datepicker ng-model="event.startDate" md-placeholder="Start date">
         </md-datepicker>

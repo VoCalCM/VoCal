@@ -2,7 +2,7 @@
 
 Meteor.publish('events', function(options, searchString) {
   var where = {
-    'name': {
+    'subject': {
       '$regex': '.*' + (searchString || '') + '.*',
       '$options': 'i'
     }

@@ -5,8 +5,8 @@
     <form class="md-whiteframe-z1" ng-submit="save()" name="form" novalidate layout-padding="">
       <p>Add a event</p>
       <md-input-container>
-        <label>Name</label>
-        <input ng-model="newEvent.name" placeholder="Name">
+        <label>Subject</label>
+        <input ng-model="newEvent.subject" placeholder="Subject">
       </md-input-container>
       <input class="md-button" type="submit" value="Add">
     </form>
@@ -23,7 +23,7 @@
 
     <ul>
       <li dir-paginate="event in events | itemsPerPage: perPage" total-items="eventsCount" current-page='page'>
-        <p><a href="/events/{{event._id}}">{{ event.name }}</a> <button ng-click="remove(event)">&times;</button></p>
+        <p><a href="/events/{{event._id}}">{{ event.subject }}</a> <button ng-click="remove(event)">&times;</button></p>
       </li>
     </ul>
     <dir-pagination-controls on-page-change="pageChanged(newPageNumber)"></dir-pagination-controls>
