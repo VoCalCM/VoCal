@@ -9,8 +9,6 @@
 */
 
 /**
- * This sample shows how to create a Lambda function for handling Alexa Skill requests that:
- *
  * - Web service: communicate with an external web service to get events for specified days in history (Wikipedia API)
  * - Pagination: after obtaining a list of events, read a small subset of events and wait for user prompt to read the next subset of events by maintaining session state
  * - Dialog and Session state: Handles two models, both a one-shot ask and tell model, and a multi-turn dialog model.
@@ -101,7 +99,7 @@ VoCalSkill.prototype.intentHandlers = {
     "AMAZON.HelpIntent": function (intent, session, response) {
         var speechText = "With VoCal, you can get your upcoming events.  " +
             "For example, you could say today, or April thirteenth, or you can say exit. Now, which day do you want?";
-        var repromptText = "Which day do you want?";
+        var repromptText = "Which day do you want to hear events for?";
         var speechOutput = {
             speech: speechText,
             type: AlexaSkill.speechOutputType.PLAIN_TEXT
@@ -138,8 +136,8 @@ function getWelcomeResponse(response) {
     // If we wanted to initialize the session to have some attributes we could add those here.
     var cardTitle = "Your upcoming events";
     var repromptText = "With VoCal, you can get your upcoming events. For example, you could say today, or April thirtienth, or you can say exit. Now, would you ?";
-    var speechText = "<p>VoCal.</p> <p>What day do you want events for?</p>";
-    var cardOutput = "VoCal. What day do you want events for?";
+    var speechText = "<p>Welcome to VoCal.</p> <p>What day do you want events for?</p>";
+    var cardOutput = "Welcome to VoCal. What day do you want events for?";
     // If the user either does not reply to the welcome message or says something that is not
     // understood, they will be prompted again with this text.
 
@@ -217,11 +215,9 @@ function handleFirstEventRequest(intent, session, response) {
             cardContent = speechText;
             response.tell(speechText);
         } else {
-            for (i = 0; i < paginationSize; i++) {
-                cardContent = cardContent + events[i] + " ";
-                speechText = "<p>" + speechText + events[i].notes + "</p> ";
-            }
-            speechText = speechText + " <p>Wanna get more future?</p>";
+                cardContent = cardContent + events[0] + " ";
+                speechText = "<p>" + speechText + events[0] + "</p> ";
+            speechText = speechText + " <p>Want to hear more future events?</p>";
             var speechOutput = {
                 speech: "<speak>" + prefixContent + speechText + "</speak>",
                 type: AlexaSkill.speechOutputType.SSML
@@ -306,16 +302,7 @@ function getJsonEventsFromWikipedia(day, date, eventCallback) {
     //  moment().toDate();
     //  parse data from server and convert to Alexa friendly objects (transform date)
 
-    var stringResult = [
-        { 
-            date:  "4/9/2016"  ,
-            notes: "Javascript meetup at capital factory"
-        },
-        {
-            date: "4/9/2016",
-            notes: "email nodejs meetup group"
-        }
-    ];
+    var stringResult = [ "Javascript meetup at capital factory" ];
     eventCallback(stringResult);
 
 }
