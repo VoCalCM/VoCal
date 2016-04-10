@@ -179,33 +179,8 @@ function handleFirstEventRequest(intent, session, response) {
 
     var cardTitle = "Events on " + monthNames[date.getMonth()] + " " + date.getDate();
 
-//wikipedia piece
-    getJsonEventsFromWikipedia(monthNames[date.getMonth()], date.getDate(), function (events) {
-        // var speechText = "",
-        //     i;
-        // sessionAttributes.text = events;
-        // session.attributes = sessionAttributes;
-        // if (events.length == 0) {
-        //     speechText = "There is a problem connecting to Wikipedia at this time. Please try again later.";
-        //     cardContent = speechText;
-        //     response.tell(speechText);
-        // } else {
-        //     for (i = 0; i < paginationSize; i++) {
-        //         cardContent = cardContent + events[i] + " ";
-        //         speechText = "<p>" + speechText + events[i] + "</p> ";
-        //     }
-        //     speechText = speechText + " <p>Wanna go deeper in history?</p>";
-        //     var speechOutput = {
-        //         speech: "<speak>" + prefixContent + speechText + "</speak>",
-        //         type: AlexaSkill.speechOutputType.SSML
-        //     };
-        //     var repromptOutput = {
-        //         speech: repromptText,
-        //         type: AlexaSkill.speechOutputType.PLAIN_TEXT
-        //     };
-        //     response.askWithCard(speechOutput, repromptOutput, cardTitle, cardContent);
-        // }
-
+    //  Date is passed into the mongo model function to fetch specific events
+    getJsonEventsFromMongo(date, function (events) {
         var speechText = "",
             i;
         sessionAttributes.text = events;
@@ -237,14 +212,13 @@ function handleFirstEventRequest(intent, session, response) {
 /**
  * Gets a poster prepares the speech to reply to the user.
  */
- //VoCal - change to take future events request
 function handleNextEventRequest(intent, session, response) {
     var cardTitle = "With VoCal, you can get your upcoming events.",
         sessionAttributes = session.attributes,
         result = sessionAttributes.text,
         speechText = "",
         cardContent = "",
-        repromptText = "Do you want more events on this date?",
+        repromptText = "Do you want to hear more events?",
         i;
     if (!result) {
         speechText = "With VoCal, you can get your upcoming events.";
@@ -279,66 +253,15 @@ function handleNextEventRequest(intent, session, response) {
 
 // VoCal- Change this function to return a json object of relevant events 
 
-function getJsonEventsFromWikipedia(day, date, eventCallback) {
-    // var url = urlPrefix + day + '_' + date;
+function getJsonEventsFromMongo(day, date, eventCallback) {
 
-    // https.get(url, function(res) {
-    //     var body = '';
+    // Make a database call to get events for a specific day (date)
 
-    //     res.on('data', function (chunk) {
-    //         body += chunk;
-    //     });
-
-    //     res.on('end', function () {
-    //         var stringResult = parseJson(body);
-    //         eventCallback(stringResult);
-    //     });
-    // }).on('error', function (e) {
-    //     console.log("Got error: ", e);
-    // });
-
-
-    //  transform a moment object to a date object:
-    //  moment().toDate();
-    //  parse data from server and convert to Alexa friendly objects (transform date)
-
+    // The stringResult should be the parsed field value that we want to pass to Alexa to speak out
     var stringResult = [ "Javascript meetup at capital factory" ];
     eventCallback(stringResult);
-
 }
 
-function parseJson(inputText) {
-    // sizeOf (/nEvents/n) is 10
-    var text = inputText.substring(inputText.indexOf("\\nEvents\\n")+10, inputText.indexOf("\\n\\n\\nBirths")),
-        retArr = [],
-        retString = "",
-        endIndex,
-        startIndex = 0;
-
-    if (text.length == 0) {
-        return retArr;
-    }
-
-    while(true) {
-        endIndex = text.indexOf("\\n", startIndex+delimiterSize);
-        var eventText = (endIndex == -1 ? text.substring(startIndex) : text.substring(startIndex, endIndex));
-        // replace dashes returned in text from Wikipedia's API
-        eventText = eventText.replace(/\\u2013\s*/g, '');
-        // add comma after year so Alexa pauses before continuing with the sentence
-        eventText = eventText.replace(/(^\d+)/,'$1,');
-        eventText = 'In ' + eventText;
-        startIndex = endIndex+delimiterSize;
-        retArr.push(eventText);
-        if (endIndex == -1) {
-            break;
-        }
-    }
-    if (retString != "") {
-        retArr.push(retString);
-    }
-    retArr.reverse();
-    return retArr;
-}
 
 // Create the handler that responds to the Alexa Request.
 exports.handler = function (event, context) {
