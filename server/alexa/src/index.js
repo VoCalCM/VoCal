@@ -15,36 +15,18 @@
  * - Pagination: after obtaining a list of events, read a small subset of events and wait for user prompt to read the next subset of events by maintaining session state
  * - Dialog and Session state: Handles two models, both a one-shot ask and tell model, and a multi-turn dialog model.
  * - SSML: Using SSML tags to control how Alexa renders the text-to-speech.
- *
- * Examples:
- * One-shot model:
- * User:  "Alexa, ask History Buff what happened on August thirtieth."
- * Alexa: "For August thirtieth, in 2003, [...] . Wanna go deeper in history?"
- * User: "No."
- * Alexa: "Good bye!"
- *
- * Dialog model:
- * User:  "Alexa, open History Buff"
- * Alexa: "History Buff. What day do you want events for?"
- * User:  "August thirtieth."
- * Alexa: "For August thirtieth, in 2003, [...] . Wanna go deeper in history?"
- * User:  "Yes."
- * Alexa: "In 1995, Bosnian war [...] . Wanna go deeper in history?"
- * User: "No."
- * Alexa: "Good bye!"
  */
 
  /* VoCal Examples
- *  user: "Alexa, open VoCal"
- *  Alexa: "VoCal. What day do you want events for?"
- *  user: "Today" OR "April tenth"
- *  Alexa" "For April 9th, Javascript networking. Want to check more future events?"
+ *  user: "Alexa, start VoCal"
+ *  Alexa: "Welcome to VoCal. Do you want to know what's happening today?"
+ *  user: "yes" OR "April tenth"
+ *  Alexa" "For April 10th, Javascript networking. Would you like to know about more events?"
  *  user: "yes"
- *  Alexa: "For April 10th, Nodejs meetup. Want to check more future events?"
+ *  Alexa: "For April 11th, Nodejs meetup. Would to like to know about more events?"
  *  uaer: "No."
  *  Alexa: "goodBye!"
  */
-
 
 /**
  * App ID for the skill
@@ -118,7 +100,7 @@ VoCalSkill.prototype.intentHandlers = {
 
     "AMAZON.HelpIntent": function (intent, session, response) {
         var speechText = "With VoCal, you can get your upcoming events.  " +
-            "For example, you could say today, or April thirtienth, or you can say exit. Now, which day do you want?";
+            "For example, you could say today, or April thirteenth, or you can say exit. Now, which day do you want?";
         var repromptText = "Which day do you want?";
         var speechOutput = {
             speech: speechText,
@@ -154,8 +136,8 @@ VoCalSkill.prototype.intentHandlers = {
 
 function getWelcomeResponse(response) {
     // If we wanted to initialize the session to have some attributes we could add those here.
-    var cardTitle = "Your events";
-    var repromptText = "With VoCal, you can get your upcoming events. For example, you could say today, or April thirtienth, or you can say exit. Now, which day do you want?";
+    var cardTitle = "Your upcoming events";
+    var repromptText = "With VoCal, you can get your upcoming events. For example, you could say today, or April thirtienth, or you can say exit. Now, would you ?";
     var speechText = "<p>VoCal.</p> <p>What day do you want events for?</p>";
     var cardOutput = "VoCal. What day do you want events for?";
     // If the user either does not reply to the welcome message or says something that is not
@@ -201,20 +183,45 @@ function handleFirstEventRequest(intent, session, response) {
 
 //wikipedia piece
     getJsonEventsFromWikipedia(monthNames[date.getMonth()], date.getDate(), function (events) {
+        // var speechText = "",
+        //     i;
+        // sessionAttributes.text = events;
+        // session.attributes = sessionAttributes;
+        // if (events.length == 0) {
+        //     speechText = "There is a problem connecting to Wikipedia at this time. Please try again later.";
+        //     cardContent = speechText;
+        //     response.tell(speechText);
+        // } else {
+        //     for (i = 0; i < paginationSize; i++) {
+        //         cardContent = cardContent + events[i] + " ";
+        //         speechText = "<p>" + speechText + events[i] + "</p> ";
+        //     }
+        //     speechText = speechText + " <p>Wanna go deeper in history?</p>";
+        //     var speechOutput = {
+        //         speech: "<speak>" + prefixContent + speechText + "</speak>",
+        //         type: AlexaSkill.speechOutputType.SSML
+        //     };
+        //     var repromptOutput = {
+        //         speech: repromptText,
+        //         type: AlexaSkill.speechOutputType.PLAIN_TEXT
+        //     };
+        //     response.askWithCard(speechOutput, repromptOutput, cardTitle, cardContent);
+        // }
+
         var speechText = "",
             i;
         sessionAttributes.text = events;
         session.attributes = sessionAttributes;
         if (events.length == 0) {
-            speechText = "There is a problem connecting to Wikipedia at this time. Please try again later.";
+            speechText = "You do not have any events on the requested date.";
             cardContent = speechText;
             response.tell(speechText);
         } else {
             for (i = 0; i < paginationSize; i++) {
                 cardContent = cardContent + events[i] + " ";
-                speechText = "<p>" + speechText + events[i] + "</p> ";
+                speechText = "<p>" + speechText + events[i].notes + "</p> ";
             }
-            speechText = speechText + " <p>Wanna go deeper in history?</p>";
+            speechText = speechText + " <p>Wanna get more future?</p>";
             var speechOutput = {
                 speech: "<speak>" + prefixContent + speechText + "</speak>",
                 type: AlexaSkill.speechOutputType.SSML
@@ -225,6 +232,9 @@ function handleFirstEventRequest(intent, session, response) {
             };
             response.askWithCard(speechOutput, repromptOutput, cardTitle, cardContent);
         }
+
+
+
     });
 }
 
@@ -274,22 +284,40 @@ function handleNextEventRequest(intent, session, response) {
 // VoCal- Change this function to return a json object of relevant events 
 
 function getJsonEventsFromWikipedia(day, date, eventCallback) {
-    var url = urlPrefix + day + '_' + date;
+    // var url = urlPrefix + day + '_' + date;
 
-    https.get(url, function(res) {
-        var body = '';
+    // https.get(url, function(res) {
+    //     var body = '';
 
-        res.on('data', function (chunk) {
-            body += chunk;
-        });
+    //     res.on('data', function (chunk) {
+    //         body += chunk;
+    //     });
 
-        res.on('end', function () {
-            var stringResult = parseJson(body);
-            eventCallback(stringResult);
-        });
-    }).on('error', function (e) {
-        console.log("Got error: ", e);
-    });
+    //     res.on('end', function () {
+    //         var stringResult = parseJson(body);
+    //         eventCallback(stringResult);
+    //     });
+    // }).on('error', function (e) {
+    //     console.log("Got error: ", e);
+    // });
+
+
+    //  transform a moment object to a date object:
+    //  moment().toDate();
+    //  parse data from server and convert to Alexa friendly objects (transform date)
+
+    var stringResult = [
+        { 
+            date:  "4/9/2016"  ,
+            notes: "Javascript meetup at capital factory"
+        },
+        {
+            date: "4/9/2016",
+            notes: "email nodejs meetup group"
+        }
+    ];
+    eventCallback(stringResult);
+
 }
 
 function parseJson(inputText) {
