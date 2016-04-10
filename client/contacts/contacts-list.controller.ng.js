@@ -1,8 +1,9 @@
 'use strict';
 
 angular.module('vocalApp')
-.controller('ContactsListCtrl', function($scope, currentUser, fileUpload) {
+.controller('ContactsListCtrl', function($scope, currentUser, fileUpload, $http) {
   console.log(currentUser);
+  $scope.newContact = {};
   $scope.page = 1;
   $scope.perPage = 3;
   $scope.sort = {name_sort : 1};
@@ -58,9 +59,42 @@ angular.module('vocalApp')
     console.log('file is ' );
     console.dir(file);
     var uploadUrl = "https://api.havenondemand.com/1/api/sync/ocrdocument/v1";
+    var entityUrl = "https://api.havenondemand.com/1/api/sync/extractentities/v2";
     fileUpload.uploadFileToUrl(file, uploadUrl).then(function(response) {
       console.log(response.data.text_block[0].text);
       $scope.data = response.data.text_block[0].text;
+
+      var fd = new FormData();
+      fd.append('apikey', 'c4845053-cb15-4210-9b6f-6debd3c8f748');
+      fd.append('text', $scope.data);
+      fd.append('show_alternatives', false);
+      fd.append('entity_type', 'person_fullname_eng');
+      fd.append('entity_type', 'address_us');
+      fd.append('entity_type', 'internet_email');
+      fd.append('entity_type', 'number_phone_us');
+      var promise = $http.post(entityUrl, fd, {
+        transformRequest: angular.identity,
+        headers: {'Content-Type': undefined}
+      })
+        .success(function(response){
+          console.log('entity response', response);
+          var entities = response.entities;
+          entities.forEach(function(entity) {
+            if (entity.type === 'person_fullname_eng') {
+              $scope.newContact.name = entity.normalized_text;
+            } else if (entity.type === 'address_us') {
+              $scope.newContact.address = entity.normalized_text;
+            } else if (entity.type === 'internet_email') {
+              $scope.newContact.email = entity.normalized_text;
+            } else if (entity.type === 'number_phone_us') {
+              $scope.newContact.phone = entity.normalized_text;
+            }
+          });
+
+        })
+        .error(function(error){
+        });
+      return promise;
     });
   };
 
