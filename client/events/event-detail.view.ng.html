@@ -1,6 +1,6 @@
-<div class="event-detail" layout="row">
+<div class="event-detail main-detail" layout="row">
   <span flex=""></span>
-  <div layout="column">
+  <div layout="column" class="main-wrapper md-whiteframe-1dp">
     <h1>Here are the details of the event</h1>
     <form name="form" ng-submit="save()" class="md-whiteframe-z1" layout-padding layout="column">
       <md-input-container>
@@ -18,7 +18,7 @@
     </md-contact-chips>
 
       <div layout="row" layout-align="center center">
-        <md-datepicker ng-model="event.startDate" md-placeholder="Start date">
+        <md-datepicker ng-model="event.startDate" md-placeholder="Start date" style="background-color: transparent">
         </md-datepicker>
         <md-input-container class="md-block">
           <input required type="number" step="any" name="rate" ng-model="startHour" min="0"
@@ -32,7 +32,7 @@
       </div>
 
       <div layout="row" layout-align="center center">
-        <md-datepicker ng-model="event.endDate" md-placeholder="Start date">
+        <md-datepicker ng-model="event.endDate" md-placeholder="Start date" style="background-color: transparent">
         </md-datepicker>
         <md-input-container class="md-block">
           <input required type="number" step="any" name="rate" ng-model="endHour" min="0"
