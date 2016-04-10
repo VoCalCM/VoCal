@@ -15,7 +15,7 @@
  *  uaer: "No."
  *  Alexa: "goodBye!"
  */
-
+var flagFirst = 0;
 /**
  * App ID for the skill
  */
@@ -29,14 +29,9 @@ var https = require('https');
 var AlexaSkill = require('./AlexaSkill');
 
 /**
- * URL prefix to download history content from Wikipedia
- */
-var urlPrefix = 'https://en.wikipedia.org/w/api.php?action=query&prop=extracts&format=json&explaintext=&exsectionformat=plain&redirects=&titles=';
-
-/**
  * Variable defining number of events to be read at one time
  */
-var paginationSize = 3;
+var paginationSize = 1;
 
 /**
  * Variable defining the length of the delimiter between events
@@ -45,9 +40,6 @@ var delimiterSize = 2;
 
 /**
  * VoCalSkill is a child of AlexaSkill.
- * To read more about inheritance in JavaScript, see the link below.
- *
- * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Introduction_to_Object-Oriented_JavaScript#Inheritance
  */
 var VoCalSkill = function() {
     AlexaSkill.call(this, APP_ID);
@@ -87,7 +79,7 @@ VoCalSkill.prototype.intentHandlers = {
     },
 
     "AMAZON.HelpIntent": function (intent, session, response) {
-        var speechText = "With VoCal, you can get your upcoming events.  " +
+        var speechText = "With VoCal, you can get your upcoming events. " +
             "For example, you could say today, or April thirteenth, or you can say exit. Now, which day do you want?";
         var repromptText = "Which day do you want to hear events for?";
         var speechOutput = {
@@ -153,7 +145,7 @@ function handleFirstEventRequest(intent, session, response) {
     ];
     var sessionAttributes = {};
     // Read the first 3 events, then set the count to 3
-    sessionAttributes.index = paginationSize;
+    sessionAttributes.index = paginationSize + 1;
     var date = "";
 
     // If the user provides a date, then use that, otherwise use today
@@ -170,7 +162,20 @@ function handleFirstEventRequest(intent, session, response) {
     var cardTitle = "Events on " + monthNames[date.getMonth()] + " " + date.getDate();
 
     //  Date is passed into the mongo model function to fetch specific events
-    getJsonEventsFromMongo(date, function (events) {
+    getJsonEventsFromMongo(date, function (results) {
+        //processing results passed in to get specific data
+        console.log("results in first event intent ", results);
+        //Creating a string of events for Alexa to read
+        // var events = results["events"][2]["subject"];
+        // console.log("results parsed: ", results["events"]);
+
+        var events = [];
+        events.push( results["events"][0]["subject"], results["events"][1]["subject"], results["events"][3]["subject"] )
+        // var events = [];
+        // for (var r = 0; r <= results["events"].length; r++) {
+        //     events.push(results["events"][r]["subject"]);
+        // }
+
         var speechText = "",
             i;
         sessionAttributes.text = events;
@@ -180,8 +185,10 @@ function handleFirstEventRequest(intent, session, response) {
             cardContent = speechText;
             response.tell(speechText);
         } else {
-                cardContent = cardContent + events[0] + " ";
-                speechText = "<p>" + speechText + events[0] + "</p> ";
+            for (i = 0; i < paginationSize; i++) {
+                cardContent = cardContent + events[i] + " ";
+                speechText = "<p>" + speechText + events[i] + "</p> ";
+            }
             speechText = speechText + " <p>Want to hear more future events?</p>";
             var speechOutput = {
                 speech: "<speak>" + prefixContent + speechText + "</speak>",
@@ -195,12 +202,17 @@ function handleFirstEventRequest(intent, session, response) {
         }
 
     });
+
+    flagFirst++;
+    console.log("flag after first: ", flagFirst);
 }
 
 /**
  * Gets a poster prepares the speech to reply to the user.
  */
 function handleNextEventRequest(intent, session, response) {
+ flagFirst++;
+ console.log("flag after both: ", flagFirst);
     var cardTitle = "With VoCal, you can get your upcoming events.",
         sessionAttributes = session.attributes,
         result = sessionAttributes.text,
@@ -215,17 +227,18 @@ function handleNextEventRequest(intent, session, response) {
         speechText = "There are no more events for this date. Try another date by saying <break time = \"0.3s\"/> get events for august thirtieth.";
         cardContent = "There are no more events for this date. Try another date by saying, get events for august thirtieth.";
     } else {
-        for (i = 0; i < paginationSize; i++) {
-            if (sessionAttributes.index>= result.length) {
-                break;
-            }
+        // for (i = 1; i < paginationSize; i++) {
+        //     if (sessionAttributes.index>= result.length) {
+        //         break;
+        //     }
+            console.log( "in second rsponse: ", result[sessionAttributes.index] ,"  AND , ", result );
             speechText = speechText + "<p>" + result[sessionAttributes.index] + "</p> ";
             cardContent = cardContent + result[sessionAttributes.index] + " ";
             sessionAttributes.index++;
-        }
+        // }
         if (sessionAttributes.index < result.length) {
-            speechText = speechText + "Wanna lookup future events?";
-            cardContent = cardContent + "Wanna lookup future events?";
+            speechText = speechText + "Do you want to hear more events?";
+            cardContent = cardContent + "Do you want to hear more events?";
         }
     }
     var speechOutput = {
@@ -241,13 +254,43 @@ function handleNextEventRequest(intent, session, response) {
 
 // VoCal- Change this function to return a json object of relevant events 
 
-function getJsonEventsFromMongo(day, date, eventCallback) {
+function getJsonEventsFromMongo(date, eventCallback) {
 
     // Make a database call to get events for a specific day (date)
+    var url = 'https://vocal.meteorapp.com/publications/events';
+
+    https.get(url, function(res) {
+        var body = '';
+
+        res.on('data', function (chunk) {
+            body += chunk;
+        });
+
+        res.on('end', function () {
+            var stringResult = JSON.parse(body);
+            console.log("result is: ", stringResult);
+            eventCallback(stringResult);
+        });
+    }).on('error', function (e) {
+        console.log("Got error: ", e);
+    });
+
 
     // The stringResult should be the parsed field value that we want to pass to Alexa to speak out
-    var stringResult = [ "Javascript meetup at capital factory" ];
-    eventCallback(stringResult);
+    // var stringResult = [ "Javascript meetup at capital factory", "NodeJS lecture at MakerSquare" ];
+
+/*response body looks like:
+    {
+        "counts":[{"_id":"numberOfEvents","count":3}],
+        "events":[{"_id":"tNnQwdBGD3tQnvPJa",
+        "subject":"event 1"},{"_id":"nD5WT5BwHfPBEvEbB",
+        "subject":"event 2"},{"_id":"K7XCMnWzvNSko5gWw",
+        "name":"Nicks Test Event",
+        "startDate":"2016-04-21T05:00:00.000Z","startHour":5,
+        "startMinute":30,"subject":"A Test Event"}]
+    } 
+*/
+
 }
 
 
