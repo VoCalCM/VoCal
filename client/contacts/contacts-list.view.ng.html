@@ -45,11 +45,22 @@
       </md-select>
     </div>
 
-    <ul>
-      <li dir-paginate="contact in contacts | itemsPerPage: perPage" total-items="contactsCount" current-page='page'>
-        <p><a href="/contacts/{{contact._id}}">{{ contact.name }}</a> <button ng-click="remove(contact)">&times;</button></p>
-      </li>
-    </ul>
+    <md-list ng-cloak class="ng-padding-child">
+      <div dir-paginate="contact in contacts | itemsPerPage: perPage" total-items="contactsCount" current-page='page'>
+        <md-list-item ng-href="contacts/{{ contact._id }}" class="md-2-line">
+          <md-icon md-svg-icon="action:ic_event_24px"></md-icon>
+          <div class="md-list-item-text">
+            <h3>{{ contact.name }}</h3>
+            <p>{{ contact.email}}</p>
+          </div>
+          <md-button class="md-icon-button md-warn md-raised" aria-label="Add" ng-click="remove(contact)">
+            <md-icon md-svg-icon="action:ic_delete_24px"></md-icon>
+          </md-button>
+        </md-list-item>
+        <md-divider></md-divider>
+      </div>
+    </md-list>
+
     <dir-pagination-controls on-page-change="pageChanged(newPageNumber)"></dir-pagination-controls>
 
     <p>Total number of contacts: {{contactsCount}}</p>
