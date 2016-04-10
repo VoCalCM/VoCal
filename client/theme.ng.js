@@ -3,6 +3,6 @@
 angular.module('vocalApp')
 .config(function($mdThemingProvider) {
   $mdThemingProvider.theme('default')
-  .primaryPalette('teal')
+  .primaryPalette('blue')
   .accentPalette('deep-purple');
 });
